@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "heatpump": {
+      "command": "uv",
+      "args": ["run", "python", "/path/to/HeatPumpHQ/mcp-server/server.py"],
+      "env": {
+        "ENV_MODE": "production"
+      }
+    }
+  }
+}

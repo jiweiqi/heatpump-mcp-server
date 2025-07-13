@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "heatpump-remote": {
+      "type": "http",
+      "url": "https://your-mcp-server-domain.com/mcp",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  }
+}

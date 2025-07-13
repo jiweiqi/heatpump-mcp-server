@@ -37,7 +37,7 @@ logging.basicConfig(level=getattr(logging, log_level))
 logger = logging.getLogger(__name__)
 
 # Configuration
-API_BASE_URL = os.getenv("HEATPUMP_API_URL", "http://localhost:8000")
+API_BASE_URL = os.getenv("API_BASE_URL", os.getenv("HEATPUMP_API_URL", "http://localhost:8000"))
 API_KEY = os.getenv("API_KEY")  # Optional
 API_TIMEOUT = int(os.getenv("API_TIMEOUT", "30"))
 

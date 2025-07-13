@@ -19,7 +19,7 @@ import logging
 import os
 from typing import Dict, List, Optional, Any
 import uuid
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -50,6 +50,18 @@ log_level = os.getenv("LOG_LEVEL", "INFO")
 logging.basicConfig(level=getattr(logging, log_level))
 logger = logging.getLogger(__name__)
 
+# Standard MCP error codes for 2025-03-26
+MCP_ERRORS = {
+    "PARSE_ERROR": -32700,
+    "INVALID_REQUEST": -32600,
+    "METHOD_NOT_FOUND": -32601,
+    "INVALID_PARAMS": -32602,
+    "INTERNAL_ERROR": -32603,
+    "TOOL_ERROR": -32000,  # MCP-specific
+    "RESOURCE_NOT_FOUND": -32001,  # MCP-specific
+    "AUTHORIZATION_ERROR": -32002   # MCP-specific
+}
+
 # FastAPI app
 app = FastAPI(title="HeatPumpHQ MCP HTTP Server", version="1.0.0")
 
@@ -68,8 +80,8 @@ class MCPHTTPServer:
     def __init__(self):
         self.connections = {}
         
-    async def handle_mcp_request(self, message: dict) -> dict:
-        """Handle MCP JSON-RPC 2.0 request and return response"""
+    async def handle_mcp_request(self, message: dict, session_id: str = None) -> tuple[dict, str]:
+        """Handle MCP JSON-RPC 2.0 request and return response with optional session ID"""
         request_id = message.get("id")
         method = message.get("method")
         params = message.get("params", {})
@@ -79,42 +91,80 @@ class MCPHTTPServer:
         try:
             # Handle MCP protocol methods
             if method == "initialize":
-                # MCP initialization handshake
+                # Generate session ID for new connections
+                import uuid
+                new_session_id = str(uuid.uuid4())
+                
+                # Support both 2024-11-05 and 2025-03-26 protocol versions
+                client_version = params.get("protocolVersion", "2024-11-05")
+                supported_versions = ["2024-11-05", "2025-03-26"]
+                
+                # Prefer latest version if client supports it
+                if "2025-03-26" in [client_version] + supported_versions:
+                    protocol_version = "2025-03-26"
+                else:
+                    protocol_version = "2024-11-05"
+                
                 return {
                     "jsonrpc": "2.0",
                     "id": request_id,
                     "result": {
-                        "protocolVersion": "2024-11-05",
+                        "protocolVersion": protocol_version,
                         "capabilities": {
                             "tools": {},
-                            "resources": {}
+                            "resources": {},
+                            "authorization": {"oauth2": True},
+                            "sampling": False
                         },
                         "serverInfo": {
-                            "name": "HeatPumpHQ",
-                            "version": "1.0.0"
+                            "name": "HeatPumpHQ MCP Server",
+                            "version": "1.0.0",
+                            "vendor": "WattSavy",
+                            "protocolVersion": protocol_version,
+                            "description": "Professional heat pump sizing, cost estimation, and cold-climate performance verification",
+                            "homepage": "https://www.wattsavy.com",
+                            "repository": "https://github.com/weiqi-anthropic/HeatPumpHQ",
+                            "category": "energy-efficiency",
+                            "tags": ["heatpump", "hvac", "energy", "residential", "calculations"]
                         }
                     }
-                }
+                }, new_session_id
                 
             elif method == "tools/list":
                 # List available tools
                 tools = [
                     {
                         "name": "quick_sizer",
-                        "description": "Calculate required BTU capacity for heat pump based on home characteristics",
+                        "description": "Calculate required BTU capacity for heat pump based on home characteristics. Essential first step for proper heat pump sizing.",
+                        "category": "sizing",
+                        "tags": ["btu", "capacity", "sizing", "hvac"],
+                        "annotations": {
+                            "readOnlyHint": True,
+                            "idempotentHint": True,
+                            "destructiveHint": False
+                        },
                         "inputSchema": {
                             "type": "object",
                             "properties": {
-                                "zip_code": {"type": "string", "description": "5-digit US ZIP code"},
-                                "square_feet": {"type": "integer", "minimum": 100, "maximum": 10000},
-                                "build_year": {"type": "integer", "minimum": 1900, "maximum": 2025}
+                                "zip_code": {"type": "string", "pattern": "^[0-9]{5}$", "description": "5-digit US ZIP code for climate zone determination"},
+                                "square_feet": {"type": "integer", "minimum": 100, "maximum": 10000, "description": "Home square footage (100-10,000)"},
+                                "build_year": {"type": "integer", "minimum": 1900, "maximum": 2025, "description": "Year home was built (affects insulation standards)"}
                             },
-                            "required": ["zip_code", "square_feet", "build_year"]
+                            "required": ["zip_code", "square_feet", "build_year"],
+                            "additionalProperties": False,
+                            "$schema": "http://json-schema.org/draft-07/schema#"
                         }
                     },
                     {
                         "name": "bill_estimator", 
-                        "description": "Estimate electricity costs and ROI for heat pump vs current heating system",
+                        "description": "Estimate electricity costs and ROI for heat pump vs current heating system. Provides payback analysis and monthly savings projections.",
+                        "category": "financial",
+                        "tags": ["cost", "savings", "roi", "electricity", "payback"],
+                        "annotations": {
+                            "readOnlyHint": False,
+                            "idempotentHint": True,
+                            "destructiveHint": False
+                        },
                         "inputSchema": {
                             "type": "object",
                             "properties": {
@@ -126,12 +176,21 @@ class MCPHTTPServer:
                                 "gas_price_per_therm": {"type": "number"},
                                 "electricity_rate_override": {"type": "number"}
                             },
-                            "required": ["zip_code", "square_feet", "build_year", "heat_pump_model", "current_heating_fuel"]
+                            "required": ["zip_code", "square_feet", "build_year", "heat_pump_model", "current_heating_fuel"],
+                            "additionalProperties": False,
+                            "$schema": "http://json-schema.org/draft-07/schema#"
                         }
                     },
                     {
                         "name": "cold_climate_check",
-                        "description": "Verify heat pump performance at design temperatures for cold climates", 
+                        "description": "Verify heat pump performance at design temperatures for cold climates. Critical for ensuring adequate heating in harsh winter conditions.",
+                        "category": "performance",
+                        "tags": ["cold-climate", "winter", "performance", "backup-heat", "design-temp"],
+                        "annotations": {
+                            "readOnlyHint": False,
+                            "idempotentHint": True,
+                            "destructiveHint": False
+                        },
                         "inputSchema": {
                             "type": "object",
                             "properties": {
@@ -141,12 +200,21 @@ class MCPHTTPServer:
                                 "heat_pump_model": {"type": "string"},
                                 "existing_backup_heat": {"type": "string"}
                             },
-                            "required": ["zip_code", "square_feet", "build_year", "heat_pump_model"]
+                            "required": ["zip_code", "square_feet", "build_year", "heat_pump_model"],
+                            "additionalProperties": False,
+                            "$schema": "http://json-schema.org/draft-07/schema#"
                         }
                     },
                     {
                         "name": "project_cost_estimator",
-                        "description": "Estimate total project costs for heat pump installation",
+                        "description": "Estimate total project costs for heat pump installation including equipment, labor, permits, and efficiency upgrades. Comprehensive cost breakdown for project planning.",
+                        "category": "project-planning",
+                        "tags": ["installation", "project-cost", "labor", "permits", "total-cost", "upgrades"],
+                        "annotations": {
+                            "readOnlyHint": False,
+                            "idempotentHint": True,
+                            "destructiveHint": False
+                        },
                         "inputSchema": {
                             "type": "object", 
                             "properties": {
@@ -162,7 +230,9 @@ class MCPHTTPServer:
                             },
                             "required": ["zip_code", "square_feet", "build_year", "heat_pump_model", 
                                        "existing_heating_type", "ductwork_condition", "home_stories",
-                                       "insulation_quality", "air_sealing"]
+                                       "insulation_quality", "air_sealing"],
+                            "additionalProperties": False,
+                            "$schema": "http://json-schema.org/draft-07/schema#"
                         }
                     }
                 ]
@@ -171,7 +241,7 @@ class MCPHTTPServer:
                     "jsonrpc": "2.0",
                     "id": request_id,
                     "result": {"tools": tools}
-                }
+                }, session_id
                 
             elif method == "tools/call":
                 # Execute tool call
@@ -191,10 +261,13 @@ class MCPHTTPServer:
                         "jsonrpc": "2.0",
                         "id": request_id,
                         "error": {
-                            "code": -32601,
-                            "message": f"Unknown tool: {tool_name}"
+                            "code": MCP_ERRORS["TOOL_ERROR"],
+                            "message": f"Unknown tool: {tool_name}",
+                            "data": {
+                                "available_tools": ["quick_sizer", "bill_estimator", "cold_climate_check", "project_cost_estimator"]
+                            }
                         }
-                    }
+                    }, session_id
                     
                 # Wrap result in MCP tool response format
                 tool_result = {
@@ -210,7 +283,7 @@ class MCPHTTPServer:
                     "jsonrpc": "2.0",
                     "id": request_id,
                     "result": tool_result
-                }
+                }, session_id
                 
             elif method == "resources/list":
                 # List available resources
@@ -231,17 +304,20 @@ class MCPHTTPServer:
                     "jsonrpc": "2.0",
                     "id": request_id,
                     "result": {"resources": resources}
-                }
+                }, session_id
                 
             else:
                 return {
                     "jsonrpc": "2.0",
                     "id": request_id,
                     "error": {
-                        "code": -32601,
-                        "message": f"Unknown method: {method}"
+                        "code": MCP_ERRORS["METHOD_NOT_FOUND"],
+                        "message": f"Unknown method: {method}",
+                        "data": {
+                            "available_methods": ["initialize", "tools/list", "tools/call", "resources/list"]
+                        }
                     }
-                }
+                }, session_id
                 
         except Exception as e:
             logger.error(f"Error handling request {method}: {e}")
@@ -249,10 +325,14 @@ class MCPHTTPServer:
                 "jsonrpc": "2.0",
                 "id": request_id,
                 "error": {
-                    "code": -32603,
-                    "message": f"Internal error: {str(e)}"
+                    "code": MCP_ERRORS["INTERNAL_ERROR"],
+                    "message": f"Internal error: {str(e)}",
+                    "data": {
+                        "method": method,
+                        "timestamp": str(asyncio.get_event_loop().time())
+                    }
                 }
-            }
+            }, session_id
 
 # Global MCP server instance
 mcp_server = MCPHTTPServer()
@@ -270,11 +350,24 @@ async def handle_mcp_post(request: Request):
         # Validate JSON-RPC 2.0 format
         if not isinstance(data, dict) or data.get("jsonrpc") != "2.0":
             raise HTTPException(status_code=400, detail="Invalid JSON-RPC 2.0 format")
-            
-        # Handle MCP request
-        response = await mcp_server.handle_mcp_request(data)
         
-        return response
+        # Extract session ID from headers
+        session_id = request.headers.get("Mcp-Session-Id")
+        
+        # Handle MCP request
+        response, new_session_id = await mcp_server.handle_mcp_request(data, session_id)
+        
+        # Set up response with session ID header if provided
+        json_response = Response(
+            content=json.dumps(response),
+            media_type="application/json"
+        )
+        
+        # Add session ID header for initialize method or if session exists
+        if new_session_id:
+            json_response.headers["Mcp-Session-Id"] = new_session_id
+            
+        return json_response
         
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON")

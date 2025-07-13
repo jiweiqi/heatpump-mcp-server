@@ -1,0 +1,81 @@
+{
+  "name": "heatpump-mcp-server",
+  "description": "Professional heat pump sizing, cost estimation, and cold-climate performance verification for residential installations",
+  "version": "1.0.0",
+  "vendor": "WattSavy",
+  "homepage": "https://github.com/weiqi-anthropic/HeatPumpHQ",
+  "readme": "/mcp-server/README.md",
+  "license": "MIT",
+  "category": "energy-efficiency",
+  "tags": ["heatpump", "hvac", "energy", "residential", "calculations", "btu", "cost-estimation", "cold-climate"],
+  "protocolVersion": "2025-03-26",
+  "mcpVersion": "1.0.0",
+  "transport": {
+    "stdio": {
+      "available": true,
+      "command": "uv run python server.py"
+    },
+    "http": {
+      "available": true,
+      "streamable": true,
+      "url": "https://api.wattsavy.com/mcp",
+      "defaultPort": 3002
+    },
+    "sse": {
+      "available": true,
+      "url": "https://api.wattsavy.com/mcp/sse"
+    }
+  },
+  "capabilities": {
+    "tools": {
+      "count": 4,
+      "names": ["quick_sizer", "bill_estimator", "cold_climate_check", "project_cost_estimator"],
+      "annotations": {
+        "readOnlyHint": ["quick_sizer"],
+        "destructiveHint": [],
+        "idempotentHint": ["quick_sizer", "bill_estimator", "cold_climate_check", "project_cost_estimator"]
+      }
+    },
+    "resources": {
+      "count": 2,
+      "names": ["api-status", "endpoints"]
+    },
+    "prompts": {
+      "count": 0
+    },
+    "authorization": {
+      "oauth2": true
+    },
+    "sampling": false
+  },
+  "api": {
+    "base_url": "https://api.wattsavy.com",
+    "health_endpoint": "/health",
+    "timeout": 30
+  },
+  "configuration": {
+    "environment_variables": {
+      "required": [],
+      "optional": ["API_BASE_URL", "API_KEY", "ENV_MODE", "LOG_LEVEL"]
+    },
+    "files": {
+      "production": ".env.production",
+      "local": ".env.local"
+    }
+  },
+  "deployment": {
+    "docker": {
+      "available": true,
+      "image": "heatpump-mcp:latest"
+    },
+    "standalone": {
+      "available": true,
+      "command": "uv run python server.py"
+    },
+    "http_server": {
+      "available": true,
+      "command": "uv run python server_http.py",
+      "default_port": 3002
+    }
+  }
+}
