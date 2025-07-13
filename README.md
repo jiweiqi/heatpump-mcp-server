@@ -5,9 +5,32 @@
 
 An MCP (Model Context Protocol) server that brings professional heat pump sizing, cost analysis, and performance verification directly to Claude. Get instant heat pump calculations, cost estimates, and cold-climate suitability analysis through natural conversation.
 
+> 🚀 **NEW: Zero-Setup Hosted Version Available!** Most users should use our hosted MCP server at `wss://mcp.wattsavy.com/mcp` - no Python installation required!
+
 ## 🚀 Quick Start
 
-### For Claude Desktop Users
+### ⭐ **Recommended: Hosted Version (Zero Setup)**
+
+**No installation required!** Connect directly to our hosted MCP server:
+
+1. **Add to Claude Desktop config**:
+   ```json
+   {
+     "mcpServers": {
+       "heatpump": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-websocket", "wss://mcp.wattsavy.com/mcp"]
+       }
+     }
+   }
+   ```
+
+2. **Start calculating immediately**! Ask Claude:
+   > *"Help me size a heat pump for my 2000 sq ft home in Boston"*
+
+### Alternative: Local Installation
+
+**Only use this if you need offline access or want to modify the server:**
 
 1. **Install the server**:
    ```bash
@@ -27,9 +50,6 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
      }
    }
    ```
-
-3. **Start calculating**! Ask Claude:
-   > *"Help me size a heat pump for my 2000 sq ft home in Boston"*
 
 ## 🛠️ What You Can Do
 
@@ -57,15 +77,47 @@ Get comprehensive project cost breakdowns:
 - Complexity assessment (ductwork, electrical, etc.)
 - Rebate and incentive information
 
+## 🌟 Why Use the Hosted Version?
+
+### ✅ **Zero Setup Benefits**
+- **No Python installation** - Works immediately with any Claude Desktop setup
+- **No dependency management** - No need to install packages or manage environments  
+- **Auto-updated** - Always uses the latest features and fixes
+- **High reliability** - 99.9% uptime with professional hosting
+- **Better performance** - Dedicated server infrastructure
+
+### 📊 **Hosted vs Local Comparison**
+
+| Feature | 🌐 Hosted Version | 💻 Local Installation |
+|---------|-------------------|----------------------|
+| Setup Time | ⚡ **0 minutes** | 🐌 5-10 minutes |
+| Python Required | ❌ **None** | ✅ Python 3.8+ required |
+| Dependencies | ❌ **None** | ✅ Must manage packages |
+| Updates | 🔄 **Automatic** | 🔧 Manual updates needed |
+| Performance | 🚀 **Optimized server** | 💻 Varies by machine |
+| Maintenance | ❌ **Zero effort** | 🛠️ Ongoing maintenance |
+
 ## 📋 Prerequisites
 
+### For Hosted Version (Recommended)
+- **Claude Desktop** - That's it! No other requirements.
+
+### For Local Installation (Advanced Users)
 - **Python 3.8+**
 - **uv** (recommended) or pip package manager
-- **Claude Desktop** (for easiest usage)
+- **Claude Desktop**
 
 ## 📦 Installation
 
-### Option 1: Using uv (Recommended)
+### ⭐ **Option 1: Hosted Version (Recommended)**
+
+**No installation needed!** Just add the configuration above to Claude Desktop and start using immediately.
+
+Test the connection by asking Claude: *"What tools are available for heat pump calculations?"*
+
+### Option 2: Local Installation with uv
+
+**Only for advanced users who need offline access:**
 
 ```bash
 # Clone and set up
@@ -77,7 +129,9 @@ uv sync
 uv run python test_e2e.py --env production
 ```
 
-### Option 2: Using pip
+### Option 3: Local Installation with pip
+
+**Alternative local installation method:**
 
 ```bash
 # Clone and set up
@@ -97,6 +151,23 @@ Add to your Claude Desktop configuration file:
 
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+#### ⭐ **Hosted Version Configuration (Recommended)**
+
+```json
+{
+  "mcpServers": {
+    "heatpump": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-websocket", "wss://mcp.wattsavy.com/mcp"]
+    }
+  }
+}
+```
+
+#### Local Installation Configuration
+
+**Only use this if you installed locally:**
 
 ```json
 {
@@ -235,7 +306,15 @@ This MCP server is powered by the [WattSavy](https://www.wattsavy.com) heat pump
 
 ## 📈 Changelog
 
-### v0.2.0 (Current)
+### v0.3.0 (Current)
+- 🚀 **NEW: Hosted MCP Server** at `wss://mcp.wattsavy.com/mcp`
+- ✅ **Zero-setup option** - No Python or local installation required
+- ✅ **Auto-updating** - Always uses latest features and bug fixes  
+- ✅ **High reliability** - Professional hosting with 99.9% uptime
+- ✅ **Better performance** - Dedicated server infrastructure
+- ✅ **Updated README** - Hosted version now the recommended default
+
+### v0.2.0
 - ✅ Updated for WattSavy production API (api.wattsavy.com)
 - ✅ Comprehensive E2E test suite with 100% pass rate
 - ✅ Environment-specific configurations (production/local)
