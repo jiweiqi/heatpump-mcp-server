@@ -313,6 +313,7 @@ This MCP server is powered by the [WattSavy](https://www.wattsavy.com) heat pump
 - ✅ **High reliability** - Professional hosting with 99.9% uptime
 - ✅ **Better performance** - Dedicated server infrastructure
 - ✅ **Updated README** - Hosted version now the recommended default
+- ✅ **Automatic publishing** - GitHub Actions auto-publishes on changes
 
 ### v0.2.0
 - ✅ Updated for WattSavy production API (api.wattsavy.com)
