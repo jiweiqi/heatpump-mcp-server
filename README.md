@@ -1,189 +1,252 @@
-# HeatPumpHQ MCP Server
+# 🏠 HeatPumpHQ MCP Server
 
-An MCP (Model Context Protocol) server that provides access to HeatPumpHQ's heat pump calculation APIs. This server exposes tools for quick sizing, bill estimation, cold climate checking, and project cost estimation through the Model Context Protocol.
+[![MCP Server Tests](https://github.com/jiweiqi/HeatPumpHQ/actions/workflows/test-mcp-server.yml/badge.svg)](https://github.com/jiweiqi/HeatPumpHQ/actions/workflows/test-mcp-server.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Features
+An MCP (Model Context Protocol) server that brings professional heat pump sizing, cost analysis, and performance verification directly to Claude. Get instant heat pump calculations, cost estimates, and cold-climate suitability analysis through natural conversation.
 
-### Available Tools
+## 🚀 Quick Start
 
-1. **quick_sizer** - Calculate required BTU capacity for heat pumps
-   - Input: ZIP code, square footage, build year
-   - Output: Heating/cooling loads, climate zone, recommendations
+### For Claude Desktop Users
 
-2. **bill_estimator** - Estimate electricity costs and ROI
-   - Input: ZIP code, heating/cooling loads, current system, home size
-   - Output: Cost analysis, payback period, savings estimates
-
-3. **cold_climate_check** - Verify heat pump performance in cold climates
-   - Input: ZIP code, system capacity, backup heating type
-   - Output: Climate analysis, design temperature data, performance metrics
-
-4. **project_cost_estimator** - Calculate installation costs
-   - Input: ZIP code, home size, building age, system type, complexity, contractor experience
-   - Output: Cost breakdown, rebate information, financing options
-
-### Available Resources
-
-- `heatpump://api-status` - Check HeatPumpHQ API health status
-- `heatpump://endpoints` - List all available tools and their descriptions
-
-## Installation
-
-### Prerequisites
-- Python 3.8+
-- uv (recommended) or pip
-- Running HeatPumpHQ backend API (local or remote)
-
-### Setup
-
-1. **Install dependencies using uv (recommended):**
+1. **Install the server**:
    ```bash
-   cd mcp-server
-   uv venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   uv pip install -r requirements.txt
+   git clone https://github.com/jiweiqi/heatpump-mcp-server.git
+   cd heatpump-mcp-server
+   uv sync  # or pip install -r requirements.txt
    ```
 
-2. **Or install using pip:**
-   ```bash
-   cd mcp-server
-   pip install -r requirements.txt
+2. **Add to Claude Desktop config**:
+   ```json
+   {
+     "mcpServers": {
+       "heatpump": {
+         "command": "uv",
+         "args": ["--directory", "/path/to/heatpump-mcp-server", "run", "python", "server.py"]
+       }
+     }
+   }
    ```
 
-3. **Configure environment:**
-   ```bash
-   cp .env.example .env
-   # Edit .env to set your HeatPumpHQ API URL
-   ```
+3. **Start calculating**! Ask Claude:
+   > *"Help me size a heat pump for my 2000 sq ft home in Boston"*
 
-## Configuration
+## 🛠️ What You Can Do
 
-### Environment Variables
+### 🏠 **Quick Sizing**
+Get instant BTU requirements and equipment recommendations:
+- Accounts for climate zone, home age, and square footage
+- Returns specific heat pump models with efficiency ratings
+- Considers single-zone and multi-zone configurations
 
-Create a `.env` file with the following variables:
+### 💰 **Cost & Savings Analysis**  
+Calculate 10-year cost projections and payback periods:
+- Compare heat pump vs. current heating (gas, oil, electric)
+- Real electricity rates and regional cost factors
+- Monthly breakdown with seasonal variations
+
+### ❄️ **Cold Climate Performance**
+Verify heat pump viability in harsh winters:
+- Capacity curves at design temperatures
+- Backup heat requirements and recommendations
+- Performance analysis down to -15°F and below
+
+### 🔧 **Installation Cost Estimation**
+Get comprehensive project cost breakdowns:
+- Regional labor rates and permit costs
+- Complexity assessment (ductwork, electrical, etc.)
+- Rebate and incentive information
+
+## 📋 Prerequisites
+
+- **Python 3.8+**
+- **uv** (recommended) or pip package manager
+- **Claude Desktop** (for easiest usage)
+
+## 📦 Installation
+
+### Option 1: Using uv (Recommended)
 
 ```bash
-# HeatPump API Configuration
-HEATPUMP_API_URL=http://localhost:8000
-# For production, use: https://your-api-domain.com
+# Clone and set up
+git clone https://github.com/jiweiqi/heatpump-mcp-server.git
+cd heatpump-mcp-server
+uv sync
 
-# Optional: API authentication if your backend requires it
-# API_KEY=your_api_key_here
+# Test the installation
+uv run python test_e2e.py --env production
 ```
 
-## Usage
-
-### Development Mode
-
-Run the MCP server in development mode:
+### Option 2: Using pip
 
 ```bash
-cd mcp-server
-uv run mcp dev server.py
+# Clone and set up
+git clone https://github.com/jiweiqi/heatpump-mcp-server.git
+cd heatpump-mcp-server
+pip install -r requirements.txt
+
+# Test the installation
+python test_e2e.py --env production
 ```
 
-### Installation in Claude Desktop
+## ⚙️ Configuration
 
-To install this MCP server in Claude Desktop:
+### Claude Desktop Setup
 
-```bash
-cd mcp-server
-uv run mcp install server.py
-```
+Add to your Claude Desktop configuration file:
 
-### Manual Configuration
-
-Add this to your Claude Desktop configuration file:
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "heatpump": {
-      "command": "python",
-      "args": ["/path/to/HeatPumpHQ/mcp-server/server.py"],
+      "command": "uv",
+      "args": [
+        "--directory", 
+        "/absolute/path/to/heatpump-mcp-server", 
+        "run", 
+        "python", 
+        "server.py"
+      ],
       "env": {
-        "HEATPUMP_API_URL": "http://localhost:8000"
+        "ENV_MODE": "production"
       }
     }
   }
 }
 ```
 
-## Example Usage
+### Environment Configuration
 
-Once connected to an MCP client (like Claude Desktop), you can use these tools:
+The server automatically uses the production WattSavy API. For local development:
 
-### Quick Sizing Example
-```
-Can you help me size a heat pump for my 2000 sq ft home built in 2010 in ZIP code 02101?
-```
+```bash
+# Copy example configuration
+cp .env.example .env
 
-The MCP server will call the `quick_sizer` tool with:
-- zip_code: "02101"
-- square_feet: 2000
-- build_year: 2010
-
-### Bill Estimation Example
-```
-What would be the cost savings of switching from a gas furnace to a heat pump for a 1500 sq ft home in Denver (80202) with 40,000 BTU heating load and 30,000 BTU cooling load?
+# For local development (optional)
+# Edit .env to point to your local backend
+HEATPUMP_API_URL=http://localhost:8000
 ```
 
-The MCP server will call the `bill_estimator` tool with the provided parameters.
+## 🎯 Usage Examples
 
-## API Integration
+Ask Claude natural questions like:
 
-This MCP server integrates with the HeatPumpHQ backend API endpoints:
+### Sizing Questions
+- *"What size heat pump do I need for a 1800 sq ft ranch built in 1995 in Denver?"*
+- *"Help me size equipment for a 3-story home in climate zone 6A"*
 
-- `POST /api/quick-sizer/calculate`
-- `POST /api/bill-estimator/calculate`
-- `POST /api/cold-climate/check`
-- `POST /api/project-cost/calculate`
-- `GET /health` (for status checks)
+### Cost Analysis  
+- *"Compare the 10-year costs of keeping my gas furnace vs switching to a Mitsubishi heat pump"*
+- *"What's the payback period for heat pump conversion in my area?"*
 
-## Development
+### Cold Climate Suitability
+- *"Will heat pumps work in Minnesota winters for my 2500 sq ft home?"*
+- *"At what temperature would I need backup heat with a Daikin cold-climate unit?"*
+
+### Installation Planning
+- *"Estimate total installation costs including electrical upgrades and permits"*
+- *"What factors affect heat pump installation complexity?"*
+
+## 🧪 Testing
+
+Verify everything is working:
+
+```bash
+# Full test suite (recommended)
+uv run python test_e2e.py --env production
+
+# Basic functionality test
+uv run python test_server.py
+
+# Test specific environments
+uv run python test_e2e.py --env local        # Local development
+uv run python test_e2e.py --env production   # Production API
+```
+
+## 🏗️ API Reference
+
+### Tools Available
+
+| Tool | Purpose | Key Parameters |
+|------|---------|----------------|
+| `quick_sizer` | Calculate BTU requirements | ZIP code, sq ft, build year |
+| `bill_estimator` | Cost analysis & ROI | Home details, heat pump model, current fuel |
+| `cold_climate_check` | Cold weather performance | Location, equipment model, backup heating |
+| `project_cost_estimator` | Installation cost breakdown | Site complexity, regional factors |
+
+### Resources Available
+
+| Resource | Purpose |
+|----------|---------|
+| `heatpump://api-status` | Real-time backend health check |
+| `heatpump://endpoints` | List of available calculation tools |
+
+## 🔧 Development
 
 ### Project Structure
 
 ```
-mcp-server/
-├── server.py           # Main MCP server implementation
-├── requirements.txt    # Python dependencies
-├── pyproject.toml     # Project configuration
-├── .env.example       # Environment variables template
-└── README.md          # This file
+heatpump-mcp-server/
+├── server.py              # Main MCP server implementation
+├── test_e2e.py            # Comprehensive test suite
+├── test_server.py          # Basic functionality tests
+├── run_tests.sh           # Test runner script
+├── requirements.txt        # Dependencies
+├── pyproject.toml         # Python project config
+├── .env.example           # Environment template
+├── .env.production        # Production environment
+├── .env.local             # Local development environment
+└── README.md              # This documentation
 ```
 
-### Testing
+### Contributing
 
-Test the server locally:
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and add tests
+4. Run the test suite: `./run_tests.sh`
+5. Commit: `git commit -m 'Add amazing feature'`
+6. Push: `git push origin feature/amazing-feature`
+7. Open a pull request
 
-```bash
-# Start the HeatPumpHQ backend (in another terminal)
-cd ../backend
-uvicorn main:app --reload --port 8000
+## 📄 License
 
-# Test the MCP server
-cd mcp-server
-python server.py
-```
+MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Error Handling
+## 🏢 About WattSavy
 
-The MCP server includes comprehensive error handling:
+This MCP server is powered by the [WattSavy](https://www.wattsavy.com) heat pump calculation engine, providing:
 
-- **API Connection Errors**: Gracefully handles backend API unavailability
-- **Input Validation**: Uses Pydantic models to validate all inputs
-- **Timeout Handling**: 30-second timeout for API requests
-- **Structured Errors**: Returns meaningful error messages to MCP clients
+- ✅ **Real data**: 40,000+ ZIP codes, TMY3 weather data, actual equipment models
+- ✅ **Accurate calculations**: Manual J-compliant load calculations
+- ✅ **Current pricing**: Real-time electricity rates via EIA API
+- ✅ **Professional tools**: Used by HVAC contractors and homeowners
 
-## Contributing
+## 🆘 Support
 
-1. Follow the existing code style and patterns
-2. Add comprehensive docstrings for new tools
-3. Include input validation using Pydantic models
-4. Test with both local and remote HeatPumpHQ API instances
-5. Update this README for any new features
+- 📖 **Documentation**: This README and inline code comments
+- 🐛 **Issues**: [GitHub Issues](https://github.com/jiweiqi/heatpump-mcp-server/issues)
+- 💬 **Questions**: Create a discussion on GitHub
+- 🌐 **Website**: [WattSavy.com](https://www.wattsavy.com)
 
-## License
+## 📈 Changelog
 
-This MCP server follows the same license as the main HeatPumpHQ project.
+### v0.2.0 (Current)
+- ✅ Updated for WattSavy production API (api.wattsavy.com)
+- ✅ Comprehensive E2E test suite with 100% pass rate
+- ✅ Environment-specific configurations (production/local)
+- ✅ Enhanced error handling and validation
+- ✅ Real-time API status monitoring
+- ✅ Updated parameter validation for all endpoints
+
+### v0.1.0
+- Initial release with core calculation tools
+- Basic Claude Desktop integration
+
+---
+
+**Made with ❤️ for the heat pump community**

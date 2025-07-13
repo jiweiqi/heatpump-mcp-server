@@ -49,3 +49,11 @@ htmlcov/
 
 # MCP specific
 mcp-logs/
+test-results-*.json
+
+# Environment files (keep .env.example, .env.local, .env.production)
+.env
+
+# Development artifacts
+*.tmp
+*.backup
