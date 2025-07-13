@@ -19,7 +19,7 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
      "mcpServers": {
        "heatpump": {
          "command": "npx",
-         "args": ["-y", "@modelcontextprotocol/server-websocket", "wss://mcp.wattsavy.com/mcp"]
+         "args": ["-y", "@modelcontextprotocol/server-fetch", "https://mcp.wattsavy.com/mcp"]
        }
      }
    }
@@ -159,7 +159,7 @@ Add to your Claude Desktop configuration file:
   "mcpServers": {
     "heatpump": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-websocket", "wss://mcp.wattsavy.com/mcp"]
+      "args": ["-y", "@modelcontextprotocol/server-fetch", "https://mcp.wattsavy.com/mcp"]
     }
   }
 }
@@ -307,7 +307,7 @@ This MCP server is powered by the [WattSavy](https://www.wattsavy.com) heat pump
 ## 📈 Changelog
 
 ### v0.3.0 (Current)
-- 🚀 **NEW: Hosted MCP Server** at `wss://mcp.wattsavy.com/mcp`
+- 🚀 **NEW: Hosted MCP Server** at `https://mcp.wattsavy.com/mcp`
 - ✅ **Zero-setup option** - No Python or local installation required
 - ✅ **Auto-updating** - Always uses latest features and bug fixes  
 - ✅ **High reliability** - Professional hosting with 99.9% uptime
