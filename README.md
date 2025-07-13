@@ -5,11 +5,11 @@
 
 An MCP (Model Context Protocol) server that brings professional heat pump sizing, cost analysis, and performance verification directly to Claude. Get instant heat pump calculations, cost estimates, and cold-climate suitability analysis through natural conversation.
 
-> 🚀 **NEW: Zero-Setup Hosted Version Available!** Most users should use our hosted MCP server at `wss://mcp.wattsavy.com/mcp` - no Python installation required!
+> 🚀 **NEW: Zero-Setup Hosted Version Available!** Most users should use our hosted MCP server at `https://mcp.wattsavy.com/mcp` - no Python installation required!
 
 ## 🚀 Quick Start
 
-### ⭐ **Recommended: Hosted Version (Zero Setup)**
+### ⭐ **Option 1: Hosted Server (Recommended - Zero Setup)**
 
 **No installation required!** Connect directly to our hosted MCP server:
 
@@ -28,9 +28,9 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
 2. **Start calculating immediately**! Ask Claude:
    > *"Help me size a heat pump for my 2000 sq ft home in Boston"*
 
-### Alternative: Local Installation
+### **Option 2: Local Installation (Advanced Users)**
 
-**Only use this if you need offline access or want to modify the server:**
+**Use this if you need offline access, want to modify the server, or prefer local execution:**
 
 1. **Install the server**:
    ```bash
@@ -107,40 +107,39 @@ Get comprehensive project cost breakdowns:
 - **uv** (recommended) or pip package manager
 - **Claude Desktop**
 
-## 📦 Installation
+## 🏗️ Architecture Overview
 
-### ⭐ **Option 1: Hosted Version (Recommended)**
+This project provides **two MCP server implementations**:
+
+1. **🌐 HTTP Server** (`server_http.py`) - For hosted/remote access
+   - **Deployed at**: `https://mcp.wattsavy.com/mcp`
+   - **Protocol**: HTTP POST + Server-Sent Events (SSE)
+   - **Use case**: Zero-setup remote access via `@modelcontextprotocol/server-fetch`
+
+2. **💻 FastMCP Server** (`server.py`) - For local installation
+   - **Protocol**: JSON-RPC over stdio
+   - **Use case**: Local development, offline access, customization
+
+## 📦 Installation Options
+
+### ⭐ **Option 1: Hosted Server (Zero Setup)**
 
 **No installation needed!** Just add the configuration above to Claude Desktop and start using immediately.
 
 Test the connection by asking Claude: *"What tools are available for heat pump calculations?"*
 
-### Option 2: Local Installation with uv
+### **Option 2: Local FastMCP Server**
 
-**Only for advanced users who need offline access:**
+**For developers and offline use:**
 
 ```bash
 # Clone and set up
 git clone https://github.com/jiweiqi/heatpump-mcp-server.git
 cd heatpump-mcp-server
-uv sync
+uv sync  # or pip install -r requirements.txt
 
 # Test the installation
 uv run python test_e2e.py --env production
-```
-
-### Option 3: Local Installation with pip
-
-**Alternative local installation method:**
-
-```bash
-# Clone and set up
-git clone https://github.com/jiweiqi/heatpump-mcp-server.git
-cd heatpump-mcp-server
-pip install -r requirements.txt
-
-# Test the installation
-python test_e2e.py --env production
 ```
 
 ## ⚙️ Configuration
@@ -152,7 +151,7 @@ Add to your Claude Desktop configuration file:
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-#### ⭐ **Hosted Version Configuration (Recommended)**
+#### ⭐ **Hosted Server (Recommended)**
 
 ```json
 {
@@ -165,9 +164,7 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-#### Local Installation Configuration
-
-**Only use this if you installed locally:**
+#### **Local FastMCP Server**
 
 ```json
 {
@@ -262,15 +259,16 @@ uv run python test_e2e.py --env production   # Production API
 
 ```
 heatpump-mcp-server/
-├── server.py              # Main MCP server implementation
+├── server.py              # FastMCP server (local/stdio)
+├── server_http.py          # HTTP+SSE server (hosted)
 ├── test_e2e.py            # Comprehensive test suite
 ├── test_server.py          # Basic functionality tests
 ├── run_tests.sh           # Test runner script
-├── requirements.txt        # Dependencies
+├── Dockerfile             # Docker container config
+├── requirements.txt        # Python dependencies
 ├── pyproject.toml         # Python project config
-├── .env.example           # Environment template
-├── .env.production        # Production environment
-├── .env.local             # Local development environment
+├── uv.lock                # UV lock file
+├── LICENSE                # MIT license
 └── README.md              # This documentation
 ```
 
