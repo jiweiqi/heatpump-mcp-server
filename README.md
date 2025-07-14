@@ -13,6 +13,7 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
 
 **No installation required!** Connect directly to our hosted MCP server:
 
+#### For Claude Desktop:
 1. **Add to Claude Desktop config**:
    ```json
    {
@@ -23,6 +24,12 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
        }
      }
    }
+   ```
+
+#### For Claude Code:
+1. **Run the following command** to install the MCP server:
+   ```bash
+   claude mcp install "npx -y @modelcontextprotocol/server-fetch https://mcp.wattsavy.com/mcp" --name heatpump
    ```
 
 2. **Start calculating immediately**! Ask Claude:
@@ -39,7 +46,9 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
    uv sync  # or pip install -r requirements.txt
    ```
 
-2. **Add to Claude Desktop config**:
+2. **Configuration**:
+
+   **For Claude Desktop**:
    ```json
    {
      "mcpServers": {
@@ -49,6 +58,11 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
        }
      }
    }
+   ```
+
+   **For Claude Code**:
+   ```bash
+   claude mcp install "uv --directory /path/to/heatpump-mcp-server run python server.py" --name heatpump
    ```
 
 ## 🛠️ What You Can Do
@@ -144,14 +158,16 @@ uv run python test_e2e.py --env production
 
 ## ⚙️ Configuration
 
-### Claude Desktop Setup
+### Configuration Setup
+
+#### For Claude Desktop
 
 Add to your Claude Desktop configuration file:
 
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-#### ⭐ **Hosted Server (Recommended)**
+##### ⭐ **Hosted Server (Recommended)**
 
 ```json
 {
@@ -164,7 +180,7 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-#### **Local FastMCP Server**
+##### **Local FastMCP Server**
 
 ```json
 {
@@ -184,6 +200,20 @@ Add to your Claude Desktop configuration file:
     }
   }
 }
+```
+
+#### For Claude Code
+
+##### ⭐ **Hosted Server (Recommended)**
+
+```bash
+claude mcp install "npx -y @modelcontextprotocol/server-fetch https://mcp.wattsavy.com/mcp" --name heatpump
+```
+
+##### **Local FastMCP Server**
+
+```bash
+claude mcp install "uv --directory /absolute/path/to/heatpump-mcp-server run python server.py" --name heatpump --env ENV_MODE=production
 ```
 
 ### Environment Configuration
