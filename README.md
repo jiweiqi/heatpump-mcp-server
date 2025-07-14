@@ -9,11 +9,9 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
 
 ## 🚀 Quick Start
 
-### ⭐ **Option 1: Hosted Server (Recommended - Zero Setup)**
-
 **No installation required!** Connect directly to our hosted MCP server:
 
-#### For Claude Desktop:
+### For Claude Desktop:
 1. **Add to Claude Desktop config**:
    ```json
    {
@@ -26,44 +24,14 @@ An MCP (Model Context Protocol) server that brings professional heat pump sizing
    }
    ```
 
-#### For Claude Code:
+### For Claude Code:
 1. **Run the following command** to install the MCP server:
    ```bash
-   claude mcp install "npx -y @modelcontextprotocol/server-fetch https://mcp.wattsavy.com/mcp" --name heatpump
+   claude mcp add --transport http heatpump https://mcp.wattsavy.com/mcp
    ```
 
 2. **Start calculating immediately**! Ask Claude:
    > *"Help me size a heat pump for my 2000 sq ft home in Boston"*
-
-### **Option 2: Local Installation (Advanced Users)**
-
-**Use this if you need offline access, want to modify the server, or prefer local execution:**
-
-1. **Install the server**:
-   ```bash
-   git clone https://github.com/jiweiqi/heatpump-mcp-server.git
-   cd heatpump-mcp-server
-   uv sync  # or pip install -r requirements.txt
-   ```
-
-2. **Configuration**:
-
-   **For Claude Desktop**:
-   ```json
-   {
-     "mcpServers": {
-       "heatpump": {
-         "command": "uv",
-         "args": ["--directory", "/path/to/heatpump-mcp-server", "run", "python", "server.py"]
-       }
-     }
-   }
-   ```
-
-   **For Claude Code**:
-   ```bash
-   claude mcp install "uv --directory /path/to/heatpump-mcp-server run python server.py" --name heatpump
-   ```
 
 ## 🛠️ What You Can Do
 
@@ -91,7 +59,7 @@ Get comprehensive project cost breakdowns:
 - Complexity assessment (ductwork, electrical, etc.)
 - Rebate and incentive information
 
-## 🌟 Why Use the Hosted Version?
+## 🌟 Why Use This MCP Server?
 
 ### ✅ **Zero Setup Benefits**
 - **No Python installation** - Works immediately with any Claude Desktop setup
@@ -100,26 +68,8 @@ Get comprehensive project cost breakdowns:
 - **High reliability** - 99.9% uptime with professional hosting
 - **Better performance** - Dedicated server infrastructure
 
-### 📊 **Hosted vs Local Comparison**
-
-| Feature | 🌐 Hosted Version | 💻 Local Installation |
-|---------|-------------------|----------------------|
-| Setup Time | ⚡ **0 minutes** | 🐌 5-10 minutes |
-| Python Required | ❌ **None** | ✅ Python 3.8+ required |
-| Dependencies | ❌ **None** | ✅ Must manage packages |
-| Updates | 🔄 **Automatic** | 🔧 Manual updates needed |
-| Performance | 🚀 **Optimized server** | 💻 Varies by machine |
-| Maintenance | ❌ **Zero effort** | 🛠️ Ongoing maintenance |
-
-## 📋 Prerequisites
-
-### For Hosted Version (Recommended)
-- **Claude Desktop** - That's it! No other requirements.
-
-### For Local Installation (Advanced Users)
-- **Python 3.8+**
-- **uv** (recommended) or pip package manager
-- **Claude Desktop**
+### 📋 Prerequisites
+- **Claude Desktop or Claude Code** - That's it! No other requirements.
 
 ## 🏗️ Architecture Overview
 
@@ -134,100 +84,16 @@ This project provides **two MCP server implementations**:
    - **Protocol**: JSON-RPC over stdio
    - **Use case**: Local development, offline access, customization
 
-## 📦 Installation Options
-
-### ⭐ **Option 1: Hosted Server (Zero Setup)**
-
-**No installation needed!** Just add the configuration above to Claude Desktop and start using immediately.
+## ✅ Verify Installation
 
 Test the connection by asking Claude: *"What tools are available for heat pump calculations?"*
 
-### **Option 2: Local FastMCP Server**
-
-**For developers and offline use:**
-
-```bash
-# Clone and set up
-git clone https://github.com/jiweiqi/heatpump-mcp-server.git
-cd heatpump-mcp-server
-uv sync  # or pip install -r requirements.txt
-
-# Test the installation
-uv run python test_e2e.py --env production
-```
-
 ## ⚙️ Configuration
 
-### Configuration Setup
-
-#### For Claude Desktop
-
-Add to your Claude Desktop configuration file:
+### Configuration File Locations
 
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-##### ⭐ **Hosted Server (Recommended)**
-
-```json
-{
-  "mcpServers": {
-    "heatpump": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch", "https://mcp.wattsavy.com/mcp"]
-    }
-  }
-}
-```
-
-##### **Local FastMCP Server**
-
-```json
-{
-  "mcpServers": {
-    "heatpump": {
-      "command": "uv",
-      "args": [
-        "--directory", 
-        "/absolute/path/to/heatpump-mcp-server", 
-        "run", 
-        "python", 
-        "server.py"
-      ],
-      "env": {
-        "ENV_MODE": "production"
-      }
-    }
-  }
-}
-```
-
-#### For Claude Code
-
-##### ⭐ **Hosted Server (Recommended)**
-
-```bash
-claude mcp install "npx -y @modelcontextprotocol/server-fetch https://mcp.wattsavy.com/mcp" --name heatpump
-```
-
-##### **Local FastMCP Server**
-
-```bash
-claude mcp install "uv --directory /absolute/path/to/heatpump-mcp-server run python server.py" --name heatpump --env ENV_MODE=production
-```
-
-### Environment Configuration
-
-The server automatically uses the production WattSavy API. For local development:
-
-```bash
-# Copy example configuration
-cp .env.example .env
-
-# For local development (optional)
-# Edit .env to point to your local backend
-HEATPUMP_API_URL=http://localhost:8000
-```
 
 ## 🎯 Usage Examples
 
@@ -283,7 +149,65 @@ uv run python test_e2e.py --env production   # Production API
 | `heatpump://api-status` | Real-time backend health check |
 | `heatpump://endpoints` | List of available calculation tools |
 
-## 🔧 Development
+## 🔧 Development & Local Installation
+
+**For developers who want to modify the server or need offline access:**
+
+### Local Installation
+
+```bash
+# Clone and set up
+git clone https://github.com/jiweiqi/heatpump-mcp-server.git
+cd heatpump-mcp-server
+uv sync  # or pip install -r requirements.txt
+
+# Test the installation
+uv run python test_e2e.py --env production
+```
+
+### Local Configuration
+
+#### For Claude Desktop:
+```json
+{
+  "mcpServers": {
+    "heatpump": {
+      "command": "uv",
+      "args": [
+        "--directory", 
+        "/absolute/path/to/heatpump-mcp-server", 
+        "run", 
+        "python", 
+        "server.py"
+      ],
+      "env": {
+        "ENV_MODE": "production"
+      }
+    }
+  }
+}
+```
+
+#### For Claude Code:
+```bash
+claude mcp add --transport stdio heatpump "uv --directory /absolute/path/to/heatpump-mcp-server run python server.py"
+```
+
+### Environment Configuration
+
+```bash
+# Copy example configuration
+cp .env.example .env
+
+# For local development (optional)
+# Edit .env to point to your local backend
+HEATPUMP_API_URL=http://localhost:8000
+```
+
+### Prerequisites for Local Installation
+- **Python 3.8+**
+- **uv** (recommended) or pip package manager
+- **Claude Desktop or Claude Code**
 
 ### Project Structure
 
