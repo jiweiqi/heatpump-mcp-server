@@ -40,6 +40,12 @@ from server import (
 # Load environment variables
 load_dotenv()
 
+# Version and deployment info for verification
+import time
+SERVER_VERSION = "1.2.0"
+DEPLOYMENT_TIMESTAMP = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+BUILD_ID = os.getenv("GITHUB_RUN_NUMBER", "local")
+
 # HTTP server configuration
 HTTP_HOST = os.getenv("MCP_HTTP_HOST", "0.0.0.0")
 HTTP_PORT = int(os.getenv("MCP_HTTP_PORT", "3002"))
@@ -411,12 +417,15 @@ async def handle_mcp_sse(request: Request):
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint with deployment info"""
     return {
         "status": "healthy",
         "server": "HeatPumpHQ MCP HTTP Server",
-        "version": "1.0.0",
-        "backend_api": API_BASE_URL
+        "version": SERVER_VERSION,
+        "deployment_timestamp": DEPLOYMENT_TIMESTAMP,
+        "build_id": BUILD_ID,
+        "backend_api": API_BASE_URL,
+        "protocol_versions": ["2024-11-05", "2025-03-26"]
     }
 
 @app.get("/")
@@ -424,7 +433,9 @@ async def root():
     """Root endpoint with server info"""
     return {
         "name": "HeatPumpHQ MCP HTTP Server",
-        "version": "1.0.0",
+        "version": SERVER_VERSION,
+        "deployment_timestamp": DEPLOYMENT_TIMESTAMP,
+        "build_id": BUILD_ID,
         "description": "HTTP + SSE based MCP server for heat pump calculations",
         "endpoints": {
             "mcp_post": "/mcp",
