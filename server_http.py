@@ -26,16 +26,20 @@ import uvicorn
 from dotenv import load_dotenv
 
 # Import MCP server logic from existing server.py
-from server import (
-    mcp, 
-    API_BASE_URL, 
-    API_KEY, 
-    make_api_request,
+# Add src directory to Python path
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+
+from heatpump_mcp.server import mcp
+from heatpump_mcp.config import API_BASE_URL, API_KEY
+from heatpump_mcp.api_client import make_api_request
+from heatpump_mcp.tools import (
     quick_sizer,
     bill_estimator, 
     cold_climate_check,
     project_cost_estimator
 )
+from heatpump_mcp.resources import get_api_status, get_available_endpoints
 
 # Load environment variables
 load_dotenv()

@@ -12,8 +12,8 @@ import os
 import sys
 from dotenv import load_dotenv
 
-# Add the current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add the parent directory to Python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from server import mcp, API_BASE_URL
 
@@ -29,16 +29,18 @@ async def test_tools():
     # Test API status resource
     print("\n📊 Testing API Status Resource...")
     try:
-        status = mcp.get_resource("heatpump://api-status")
-        print(f"Status: {status}")
+        from server import get_api_status
+        status = get_api_status()
+        print(f"✅ Status: {status}")
     except Exception as e:
         print(f"❌ API Status Error: {e}")
     
     # Test endpoints resource
     print("\n📋 Testing Endpoints Resource...")
     try:
-        endpoints = mcp.get_resource("heatpump://endpoints")
-        print(f"Endpoints: {endpoints}")
+        from server import get_available_endpoints
+        endpoints = get_available_endpoints()
+        print(f"✅ Endpoints: {endpoints}")
     except Exception as e:
         print(f"❌ Endpoints Error: {e}")
     
@@ -88,10 +90,10 @@ async def test_bill_estimator():
     from server import bill_estimator
     return bill_estimator(
         zip_code="02101",
-        total_heating_load=40000,
-        total_cooling_load=30000,
-        current_system="gas",
-        home_size=2000
+        square_feet=2000,
+        build_year=2010,
+        heat_pump_model="Mitsubishi MXZ-3C24NA",
+        current_heating_fuel="gas"
     )
 
 async def test_cold_climate():
@@ -99,8 +101,10 @@ async def test_cold_climate():
     from server import cold_climate_check
     return cold_climate_check(
         zip_code="02101",
-        system_capacity=40000,
-        backup_heat="electric"
+        square_feet=2000,
+        build_year=2010,
+        heat_pump_model="Mitsubishi MXZ-3C24NA",
+        existing_backup_heat="electric_strip"
     )
 
 async def test_project_cost():
@@ -108,11 +112,14 @@ async def test_project_cost():
     from server import project_cost_estimator
     return project_cost_estimator(
         zip_code="02101",
-        home_size=2000,
-        building_age="2000-2010",
-        system_type="ducted_heat_pump",
-        installation_complexity="moderate",
-        hvac_experience="experienced"
+        square_feet=2000,
+        build_year=2010,
+        heat_pump_model="Fujitsu AOU24RLXFZ",
+        existing_heating_type="gas_furnace",
+        ductwork_condition="good",
+        home_stories=2,
+        insulation_quality="good",
+        air_sealing="good"
     )
 
 if __name__ == "__main__":

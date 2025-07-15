@@ -18,12 +18,12 @@
     "http": {
       "available": true,
       "streamable": true,
-      "url": "https://api.wattsavy.com/mcp",
+      "url": "https://mcp.wattsavy.com/mcp",
       "defaultPort": 3002
     },
     "sse": {
       "available": true,
-      "url": "https://api.wattsavy.com/mcp/sse"
+      "url": "https://mcp.wattsavy.com/mcp/sse"
     }
   },
   "capabilities": {

@@ -43,8 +43,8 @@ def test_mcp_config():
         with open('server.py', 'r') as f:
             server_code = f.read()
         
-        if 'API_BASE_URL' in server_code and 'make_api_request' in server_code:
-            print("✅ server.py: Basic structure OK")
+        if 'from heatpump_mcp.server import mcp' in server_code:
+            print("✅ server.py: Basic structure OK (refactored)")
         else:
             print("❌ server.py: Missing key components")
             return False
@@ -98,8 +98,8 @@ if __name__ == "__main__":
     print("🚀 HeatPumpHQ MCP Server - Simple Test Suite")
     print("=" * 60)
     
-    # Change to script directory
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # Change to parent directory (mcp-server root)
+    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     
     success = test_mcp_config()
     test_api_connectivity()

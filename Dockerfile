@@ -21,6 +21,9 @@ RUN pip install --no-cache-dir fastapi uvicorn
 # Copy MCP server code
 COPY . .
 
+# Ensure src directory is included
+COPY src/ ./src/
+
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash mcp \
     && chown -R mcp:mcp /app

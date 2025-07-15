@@ -2,9 +2,11 @@
   "mcpServers": {
     "heatpump": {
       "command": "uv",
-      "args": ["run", "python", "/path/to/HeatPumpHQ/mcp-server/server.py"],
+      "args": ["run", "python", "server.py"],
+      "cwd": "/home/jiwei/projects/HeatPumpHQ/mcp-server",
       "env": {
-        "ENV_MODE": "production"
+        "ENV_MODE": "production",
+        "API_BASE_URL": "https://api.wattsavy.com"
       }
     }
   }
