@@ -2,7 +2,7 @@
   "mcpServers": {
     "heatpump-remote": {
       "type": "http",
-      "url": "https://your-mcp-server-domain.com/mcp",
+      "url": "https://mcp.wattsavy.com/mcp",
       "headers": {
         "Content-Type": "application/json"
       }

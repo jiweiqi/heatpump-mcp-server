@@ -3,7 +3,7 @@
   "description": "Professional heat pump sizing, cost estimation, and cold-climate performance verification for residential installations",
   "version": "1.0.0",
   "vendor": "WattSavy",
-  "homepage": "https://github.com/weiqi-anthropic/HeatPumpHQ",
+  "homepage": "https://www.wattsavy.com",
   "readme": "/mcp-server/README.md",
   "license": "MIT",
   "category": "energy-efficiency",
@@ -13,7 +13,7 @@
   "transport": {
     "stdio": {
       "available": true,
-      "command": "uv run python server.py"
+      "command": "uv run python src/heatpump_mcp/server.py"
     },
     "http": {
       "available": true,
@@ -70,11 +70,11 @@
     },
     "standalone": {
       "available": true,
-      "command": "uv run python server.py"
+      "command": "uv run python src/heatpump_mcp/server.py"
     },
     "http_server": {
       "available": true,
-      "command": "uv run python server_http.py",
+      "command": "uv run python src/server_http.py",
       "default_port": 3002
     }
   }
