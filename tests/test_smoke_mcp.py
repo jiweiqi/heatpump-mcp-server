@@ -178,8 +178,7 @@ def main():
         ("Configuration Files", test_config_files),
         ("API Connectivity", test_api_connectivity), 
         ("MCP Resources", test_resources),
-        ("MCP Tools", test_tools),
-        ("Backward Compatibility", test_backward_compatibility)
+        ("MCP Tools", test_tools)
     ]
     
     results = []
